@@ -1,0 +1,6 @@
+TODO's:
+  * unit tests
+  * replace references to '8' with class-defined value in header that is coupled with what's stored in vector
+  * following-on from above, replace functions to deal with any-size storage (including get/setbits)
+  * add B64 input to constructor
+  * remove duplicated code for hex/B64 output printing
