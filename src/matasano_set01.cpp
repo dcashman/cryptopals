@@ -1,6 +1,3 @@
-#include "Analysis.h"
-#include "BinaryBlob.h"
-#include "utils.h"
 #include "matasano_set01.h"
 
 /* convert hex to b64 */
@@ -84,4 +81,34 @@ std::string problem06() {
     BinaryBlob b6 = BinaryBlob(in, 64);
     BinaryBlob s6 = breakRepeatingKeyXor(english_freq_table, b6);
     return s6.ascii();
+}
+
+std::string problem07() {
+    std::ifstream instream;
+    instream.open(rootdir + "res/p7.txt", std::ios::in);
+    if (!instream.is_open()) {
+        std::cerr << "Can't open p7.txt\n";
+        return std::string("p07 failed.\n");
+    }
+    std::string in{};
+    std::string line;
+    while(std::getline(instream, line)) {
+        in += line;
+    }
+    BinaryBlob b7 = BinaryBlob(in, 64);
+    int num_bytes = b7.size();
+    int act_num_bytes = 0, tot_bytes = 0;
+    unsigned char key[] = "YELLOW SUBMARINE";
+    EVP_CIPHER_CTX* my_cipher_ctx = EVP_CIPHER_CTX_new();
+    EVP_DecryptInit_ex(my_cipher_ctx, EVP_aes_128_ecb(), NULL, key, NULL);
+    unsigned char* out = (unsigned char *) malloc(num_bytes * 2 + EVP_CIPHER_CTX_block_size(my_cipher_ctx));
+    if (!out)
+        return  "p7 - OOM\n";
+    EVP_DecryptUpdate(my_cipher_ctx, out, &act_num_bytes, b7.getRawBuf(), num_bytes);
+    tot_bytes += act_num_bytes;
+    EVP_DecryptFinal_ex(my_cipher_ctx, out + act_num_bytes, &act_num_bytes);
+    tot_bytes += act_num_bytes;
+    EVP_CIPHER_CTX_free(my_cipher_ctx);
+    BinaryBlob s7 = BinaryBlob(out, tot_bytes);
+    return s7.ascii();
 }

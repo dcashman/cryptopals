@@ -1,10 +1,8 @@
 LOCAL_DIR := /home/dcashman/projects/cryptopals
-INC_DIR := $(LOCAL_DIR)/include
+LIBS_DIR := /home/dcashman/projects
+INC_DIRS := $(LOCAL_DIR)/include
 OUT_DIR := $(LOCAL_DIR)/out
 SRC_DIR := $(LOCAL_DIR)/src
-
-CC  := clang
-COMMON_CC_FLAGS := -c -Wall -Werror -I$(INC_DIR)
 
 SRCS := \
     Analysis.cpp \
@@ -12,6 +10,18 @@ SRCS := \
     main.cpp \
     matasano_set01.cpp \
     utils.c
+
+# collection of libs to build against and rely upon
+EXT_SHARED_LIBS := \
+    $(LIBS_DIR)/openssl/libcrypto.so
+
+# hackily deal with this for now, should come up system for external libs
+INC_DIRS := \
+    $(INC_DIRS) \
+    $(LIBS_DIR)/openssl/include \
+
+CC  := clang
+COMMON_CC_FLAGS := -c -Wall -Werror $(foreach d, $(INC_DIRS), -I$(d))
 
 # global target(s)
 MATASANO := $(OUT_DIR)/matasano
@@ -41,7 +51,7 @@ all_objs := $(c_objs) $(cpp_objs)
 
 $(MATASANO) : PRIVATE_LD := $(CC)
 $(MATASANO) : PRIVATE_LD_LIBS := -lstdc++ -lm
-$(MATASANO) : $(all_objs)
+$(MATASANO) : $(all_objs) $(EXT_SHARED_LIBS)
 	mkdir -p $(dir $@)
 	$(PRIVATE_LD) -o $@ $^ $(PRIVATE_LD_LIBS)
 

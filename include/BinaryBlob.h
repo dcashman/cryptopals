@@ -22,7 +22,7 @@ class BinaryBlob {
     /* Create binary blob which repeats given byte, len times */
     BinaryBlob(uint8_t byte, size_t len);
 
-    /* Create binary blob from given file */
+    /* Create binary blob from given file as pure bytes*/
     BinaryBlob(std::ifstream& infile);
 
     /* Create binary blob represented by the string s, with each character
@@ -33,11 +33,20 @@ class BinaryBlob {
     // get the n-indexed byte from the blob (starting at 0)
     uint8_t getByte(size_t n);
 
+    // get the raw buffer containing the BinaryBlob
+    uint8_t* getRawBuf();
+
     // get new binary blob representing elements [start, end)
     // TODO: use sp<>?
     BinaryBlob getBytesSlice(int start_index, size_t len);
 
+    /* returns number of bytes in blob */
     size_t size();
+
+    /*
+     * Copy BinaryBlob
+     */
+    BinaryBlob& operator=(BinaryBlob &rh);
 
     /*
      * add two binary blobs.  concatenates the rhs to the lhs

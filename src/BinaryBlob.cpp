@@ -84,6 +84,10 @@ uint8_t BinaryBlob::getByte(size_t n) {
         return data[n];
 }
 
+uint8_t* BinaryBlob::getRawBuf() {
+    return data.data();
+}
+
 BinaryBlob BinaryBlob::getBytesSlice(int start_index, size_t len) {
     if (!(start_index + len <= data.size()))
         throw std::invalid_argument("Attempt to get slice beyond bounds of BinaryBlob");
@@ -93,6 +97,15 @@ BinaryBlob BinaryBlob::getBytesSlice(int start_index, size_t len) {
 size_t BinaryBlob::size()
 {
     return data.size();
+}
+
+BinaryBlob& BinaryBlob::operator=(BinaryBlob& rh)
+{
+    this->data.clear();
+    this->data.resize(rh.data.size());
+    for (auto const& b : rh.data)
+        this->data.push_back(b);
+    return *this;
 }
 
 BinaryBlob& BinaryBlob::operator+=(BinaryBlob& rh)

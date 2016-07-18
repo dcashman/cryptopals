@@ -1,8 +1,13 @@
 #include <iostream>
 #include <limits>
+#include <openssl/err.h>
+#include <openssl/evp.h>
 #include <vector>
 
+#include "Analysis.h"
 #include "BinaryBlob.h"
+#include "utils.h"
+
 /* matasano_set01.h
  * author: Dan Cashman
  */
@@ -25,6 +30,6 @@ std::string problem05();
 
 std::string problem06();
 
-//std::string problem07();
+std::string problem07();
 
 #endif //MATASANO_SET01_H
