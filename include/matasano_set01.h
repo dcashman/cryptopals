@@ -2,6 +2,7 @@
 #include <limits>
 #include <openssl/err.h>
 #include <openssl/evp.h>
+#include <unordered_map>
 #include <vector>
 
 #include "Analysis.h"
@@ -31,5 +32,7 @@ std::string problem05();
 std::string problem06();
 
 std::string problem07();
+
+std::string problem08();
 
 #endif //MATASANO_SET01_H

@@ -102,7 +102,7 @@ size_t BinaryBlob::size()
 BinaryBlob& BinaryBlob::operator=(BinaryBlob& rh)
 {
     this->data.clear();
-    this->data.resize(rh.data.size());
+    this->data.reserve(rh.data.size());
     for (auto const& b : rh.data)
         this->data.push_back(b);
     return *this;

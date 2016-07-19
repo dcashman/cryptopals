@@ -4,7 +4,7 @@
 
 #include "matasano_set01.h"
 
-#define MAX_PROBLEMS 7
+#define MAX_PROBLEMS 8
 
 std::string (*matasano_problems[MAX_PROBLEMS])() = {
     problem01,
@@ -14,6 +14,7 @@ std::string (*matasano_problems[MAX_PROBLEMS])() = {
     problem05,
     problem06,
     problem07,
+    problem08,
 };
 
 static void usage() {

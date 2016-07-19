@@ -112,3 +112,34 @@ std::string problem07() {
     BinaryBlob s7 = BinaryBlob(out, tot_bytes);
     return s7.ascii();
 }
+
+std::string problem08() {
+    std::ifstream instream;
+    instream.open(rootdir + "res/p8.txt", std::ios::in);
+    if (!instream.is_open()) {
+        std::cerr << "Can't open p8.txt\n";
+        return std::string("p08 failed.\n");
+    }
+    std::string line;
+    int max_collisions = 0;
+    BinaryBlob max;
+    while(std::getline(instream, line)) {
+	BinaryBlob lineBlob = BinaryBlob(line, 16);
+	// map bytes as string for convenience
+	std::unordered_map<std::string, int> cols{};
+	int tmp_cols = 0;
+	// go through each block in blob, except for last if less than full
+	for (int i = 0; i <= lineBlob.size() - 16; i+=16) {
+	    BinaryBlob tmp = lineBlob.getBytesSlice(i, 16);
+	    if (cols.count(tmp.ascii()))
+	        tmp_cols++;
+	    else
+	        cols.insert({tmp.ascii(), 1});
+	}
+	if (tmp_cols >= max_collisions) {
+	    max_collisions = tmp_cols;
+	    max = lineBlob;
+	}
+    }
+    return max.hex();
+}
