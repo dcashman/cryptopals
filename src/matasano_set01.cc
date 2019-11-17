@@ -83,6 +83,8 @@ std::string problem06() {
     return s6.ascii();
 }
 
+// TODO (dcashman): switch from openssl.  Disable for now.
+/*
 std::string problem07() {
     std::ifstream instream;
     instream.open(rootdir + "res/p7.txt", std::ios::in);
@@ -113,6 +115,7 @@ std::string problem07() {
     return s7.ascii();
 }
 
+*/
 std::string problem08() {
     std::ifstream instream;
     instream.open(rootdir + "res/p8.txt", std::ios::in);
