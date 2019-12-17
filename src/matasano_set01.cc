@@ -1,5 +1,7 @@
 #include "matasano_set01.h"
 
+#include "src/include/openssl/aes.h"
+
 /* convert hex to b64 */
 std::string problem01() {
     BinaryBlob b1("49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d", 16);
@@ -83,8 +85,6 @@ std::string problem06() {
     return s6.ascii();
 }
 
-// TODO (dcashman): switch from openssl.  Disable for now.
-/*
 std::string problem07() {
     std::ifstream instream;
     instream.open(rootdir + "res/p7.txt", std::ios::in);
@@ -98,24 +98,24 @@ std::string problem07() {
         in += line;
     }
     BinaryBlob b7 = BinaryBlob(in, 64);
-    int num_bytes = b7.size();
-    int act_num_bytes = 0, tot_bytes = 0;
     unsigned char key[] = "YELLOW SUBMARINE";
-    EVP_CIPHER_CTX* my_cipher_ctx = EVP_CIPHER_CTX_new();
-    EVP_DecryptInit_ex(my_cipher_ctx, EVP_aes_128_ecb(), NULL, key, NULL);
-    unsigned char* out = (unsigned char *) malloc(num_bytes * 2 + EVP_CIPHER_CTX_block_size(my_cipher_ctx));
-    if (!out)
-        return  "p7 - OOM\n";
-    EVP_DecryptUpdate(my_cipher_ctx, out, &act_num_bytes, b7.getRawBuf(), num_bytes);
-    tot_bytes += act_num_bytes;
-    EVP_DecryptFinal_ex(my_cipher_ctx, out + act_num_bytes, &act_num_bytes);
-    tot_bytes += act_num_bytes;
-    EVP_CIPHER_CTX_free(my_cipher_ctx);
-    BinaryBlob s7 = BinaryBlob(out, tot_bytes);
-    return s7.ascii();
+    const size_t BLOCKSIZE = 16;
+    AES_KEY aes_key;
+    if (AES_set_decrypt_key(key, 128, &aes_key)) {
+        return std::string("p07 unable to set AES key\n");
+    }
+    BinaryBlob output{};
+    // AES_decrypt decrypts one block at a time to effectively give us ecb mode.
+    for (int i = 0; i < b7.size(); i += BLOCKSIZE) {
+        uint8_t out_buf[BLOCKSIZE];
+        AES_decrypt(b7.getBytesSlice(i, BLOCKSIZE).getRawBuf(), out_buf, &aes_key);
+        BinaryBlob out_blob{out_buf, BLOCKSIZE};
+        output += out_blob;
+    }
+
+    return output.ascii();
 }
 
-*/
 std::string problem08() {
     std::ifstream instream;
     instream.open(rootdir + "res/p8.txt", std::ios::in);

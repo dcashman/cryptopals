@@ -8,7 +8,7 @@ cc_binary(
          ":BinaryBlob",
          ":freq",
          ":matasano_set01",
-         ":utils"
+         ":utils",
     ],
 )
 
@@ -41,6 +41,7 @@ cc_library(
     hdrs = ["matasano_set01.h"],
     deps = [
          ":Analysis",
+         "@boringssl//:crypto",
     ],
 )
 
