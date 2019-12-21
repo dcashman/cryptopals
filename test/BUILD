@@ -5,3 +5,12 @@ cc_test(
         "@gtest//:gtest",
     ],
 )
+
+cc_test(
+    name = "BinaryBlobTest",
+    srcs = ["BinaryBlobTest.cc"],
+    deps = [
+        "@gtest//:gtest",
+        "//src:BinaryBlob",
+    ],
+)
