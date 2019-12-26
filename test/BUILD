@@ -10,7 +10,7 @@ cc_test(
     name = "BinaryBlobTest",
     srcs = ["BinaryBlobTest.cc"],
     deps = [
-        "@gtest//:gtest",
+        "@gtest//:gtest_main",
         "//src:BinaryBlob",
     ],
 )
