@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
         usage();
     rootdir = std::string(argv[1]);
     int problem_num = atoi(argv[2]);
-    if (problem_num < 0 || problem_num > MAX_PROBLEMS )
+    if (problem_num < 1 || problem_num > MAX_PROBLEMS )
         usage();
     // get english ascii frequency distribution (based on moby dick).
     english_freq_table = create_ascii_freq_table(rootdir + "res/mobydick.txt");
