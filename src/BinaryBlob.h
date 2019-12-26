@@ -44,11 +44,6 @@ class BinaryBlob {
     size_t size();
 
     /*
-     * Copy BinaryBlob
-     */
-    BinaryBlob& operator=(BinaryBlob &rh);
-
-    /*
      * add two binary blobs.  concatenates the rhs to the lhs
      */
     BinaryBlob& operator+=(BinaryBlob &rh);

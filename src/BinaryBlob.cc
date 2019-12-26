@@ -99,15 +99,6 @@ size_t BinaryBlob::size()
     return data.size();
 }
 
-BinaryBlob& BinaryBlob::operator=(BinaryBlob& rh)
-{
-    this->data.clear();
-    this->data.reserve(rh.data.size());
-    for (auto const& b : rh.data)
-        this->data.push_back(b);
-    return *this;
-}
-
 BinaryBlob& BinaryBlob::operator+=(BinaryBlob& rh)
 {
     for (auto const& b : rh.data)
