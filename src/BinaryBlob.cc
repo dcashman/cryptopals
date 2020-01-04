@@ -217,6 +217,19 @@ std::string BinaryBlob::hex()
     return out;
 }
 
+void BinaryBlob::padPKCS7(size_t blocksize) {
+    if (blocksize > 256) {
+        throw std::invalid_argument("BinaryBlob blocksize must be less than 256 (2 ^ 8).");
+    }
+    // We must add padding to make the binary blob a multilple of blocksize, and
+    // each added padding byte should encode the number of bytes added.
+    size_t padding_num = blocksize - this->size() % blocksize;
+    for (int i = 0; i < padding_num; i++) {
+        this->data.push_back(padding_num);
+    }
+    return;
+}
+
 uint8_t BinaryBlob::getBits(uint8_t b, int start, int len)
 {
     return (b & ((1 << (start + len)) - 1)) >> start;

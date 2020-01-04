@@ -67,6 +67,15 @@ class BinaryBlob {
     std::string B64();
     std::string hex();
 
+    /*
+     * PKCS#7 padding.  Add padding to the end of the binary blob so that it is
+     * a multiple of the given blocksize.  There must be padding present, so if
+     * it is already a multiple of blocksize, we will have to add a whole new
+     * block.  Blocksize must be less than 256, to enable the padding number to
+     * be represented by one byte.  This modifies the current blob.
+     */
+    void padPKCS7(size_t blocksize);
+
  private:
     static uint8_t getBits(uint8_t b, int start, int len);
     static void setBits(uint8_t &dest, uint8_t src, int start, int len);

@@ -22,3 +22,29 @@ TEST_F(BinaryBlobTest, getByte) {
         EXPECT_EQ(i, binary_blob_.getByte(i));
     }
 }
+
+TEST_F(BinaryBlobTest, padPKCS7) {
+    binary_blob_.padPKCS7(16);
+    EXPECT_EQ(16, binary_blob_.size());
+    // Make sure original data wasn't altered.
+    for (int i = 0; i < 4; i++) {
+        EXPECT_EQ(i, binary_blob_.getByte(i));
+    }
+    // Make sure we added the right padding.
+    for (int i = 4; i < 16; i++) {
+        EXPECT_EQ(12, binary_blob_.getByte(i));
+    }
+}
+
+TEST_F(BinaryBlobTest, padPKCS7Full) {
+    binary_blob_.padPKCS7(4);
+    EXPECT_EQ(8, binary_blob_.size());
+    // Make sure original data wasn't altered.
+    for (int i = 0; i < 4; i++) {
+        EXPECT_EQ(i, binary_blob_.getByte(i));
+    }
+    // Make sure we added the right padding, in this case a whole new block.
+    for (int i = 4; i < 8; i++) {
+        EXPECT_EQ(4, binary_blob_.getByte(i));
+    }
+}
