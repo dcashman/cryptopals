@@ -1,4 +1,4 @@
-#include "matasano_set01.h"
+#include "matasano_problems.h"
 
 #include "src/include/openssl/aes.h"
 
@@ -145,4 +145,10 @@ std::string problem08() {
 	}
     }
     return max.hex();
+}
+
+std::string problem09() {
+    BinaryBlob b9{"YELLOW SUBMARINE", 256};
+    b9.padPKCS7(20);
+    return b9.hex();
 }

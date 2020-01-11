@@ -10,7 +10,7 @@ cc_binary(
          ":Analysis",
          ":BinaryBlob",
          ":freq",
-         ":matasano_set01",
+         ":matasano_problems",
          ":utils",
     ],
 )
@@ -39,9 +39,9 @@ cc_library(
 )
 
 cc_library(
-    name = "matasano_set01",
-    srcs = ["matasano_set01.cc"],
-    hdrs = ["matasano_set01.h"],
+    name = "matasano_problems",
+    srcs = ["matasano_problems.cc"],
+    hdrs = ["matasano_problems.h"],
     deps = [
          ":Analysis",
          "@boringssl//:crypto",
