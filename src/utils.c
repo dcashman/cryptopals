@@ -164,31 +164,39 @@ int bytes_to_ascii_b64_str(char **ascii_str, const uint8_t *bytes, size_t bytes_
     return -1;
   }
   int extra_bytes, z_padding_ct;
-  size_t b64_base_len, b64_full_len;
+  size_t b64_char_count;
   char *p;
   uint8_t *padded_bytes;
   uint8_t *retrieved_bits;
 
+  // 3 bytes fits nicely intno 4 base64. We'll deal with any additional bytes
+  // thereafter specially.
   extra_bytes = bytes_size%3;
-  z_padding_ct = (3 - extra_bytes)%3;  //3 bytes = 4 base64 chars
-  b64_base_len = bytes_size/3 * 4;
+
+  // The extra bit-pairs added to pad out the b64 char to round the bytes out
+  // to a multiple of 3.
+  z_padding_ct = (3 - extra_bytes)%3;
+
+  // Every 3 bytes will generate 4 output characters.
+  b64_char_count = bytes_size/3 * 4;
+
+  // Not sure what we're doing here...
   if(extra_bytes) {
     padded_bytes = (uint8_t *) malloc(bytes_size + z_padding_ct);
     if (!padded_bytes)
         return -ENOMEM;
     memcpy(padded_bytes, bytes, bytes_size);
     memset(padded_bytes+bytes_size, 0, z_padding_ct);
-    b64_base_len += 4;
+    b64_char_count += 4;  // Final 3 bytes have 4 more output characters.
   } else {
       padded_bytes = (uint8_t *) malloc(bytes_size);
       if (!padded_bytes)
           return -ENOMEM;
+      memcpy(padded_bytes, bytes, bytes_size);
   }
-  memcpy(padded_bytes, bytes, bytes_size);
-  b64_full_len =  b64_base_len + z_padding_ct + 1;  // add null terminator
-  *ascii_str = (char *) malloc(b64_full_len);
+  *ascii_str = (char *) malloc(b64_char_count + 1); // Add one for null terminator.
   p = *ascii_str;
-  for (int i = 0; i < b64_base_len; i++) {
+  for (int i = 0; i < b64_char_count - z_padding_ct; i++) {
     if(retrieve_bit_seq(padded_bytes, bytes_size + z_padding_ct, i*6, 6, &retrieved_bits))
       return -1;
     *p++ = binary_to_b64(*retrieved_bits);
