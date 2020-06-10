@@ -1,6 +1,5 @@
+#include "Block.h"
 #include "matasano_problems.h"
-
-#include "src/include/openssl/aes.h"
 
 /* convert hex to b64 */
 std::string problem01() {
@@ -100,16 +99,11 @@ std::string problem07() {
     BinaryBlob b7 = BinaryBlob(in, 64);
     unsigned char key[] = "YELLOW SUBMARINE";
     const size_t BLOCKSIZE = 16;
-    AES_KEY aes_key;
-    if (AES_set_decrypt_key(key, 128, &aes_key)) {
-        return std::string("p07 unable to set AES key\n");
-    }
     BinaryBlob output{};
     // AES_decrypt decrypts one block at a time to effectively give us ecb mode.
     for (int i = 0; i < b7.size(); i += BLOCKSIZE) {
-        uint8_t out_buf[BLOCKSIZE];
-        AES_decrypt(b7.getBytesSlice(i, BLOCKSIZE).getRawBuf(), out_buf, &aes_key);
-        BinaryBlob out_blob{out_buf, BLOCKSIZE};
+        BinaryBlob in_blob = b7.getBytesSlice(i, BLOCKSIZE);
+        BinaryBlob out_blob = aes_decrypt(in_blob, BinaryBlob(key, BLOCKSIZE), BLOCKSIZE);
         output += out_blob;
     }
 
@@ -151,4 +145,23 @@ std::string problem09() {
     BinaryBlob b9{"YELLOW SUBMARINE", 256};
     b9.padPKCS7(20);
     return b9.hex();
+}
+
+std::string problem10() {
+    std::ifstream instream;
+    instream.open(rootdir + "res/p10.txt", std::ios::in);
+    if (!instream.is_open()) {
+        std::cerr << "Can't open p10.txt\n";
+        return std::string("p10 failed.\n");
+    }
+    std::string in{};
+    std::string line;
+    while(std::getline(instream, line)) {
+        in += line;
+    }
+    BinaryBlob b10 = BinaryBlob(in, 64);
+    BinaryBlob key{"YELLOW SUBMARINE", 256};
+    BinaryBlob plaintext = cbc_aes_decrypt(b10, key, 16);
+    plaintext.stripPKCS7();
+    return plaintext.ascii();
 }

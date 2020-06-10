@@ -230,6 +230,12 @@ void BinaryBlob::padPKCS7(size_t blocksize) {
     return;
 }
 
+void BinaryBlob::stripPKCS7() {
+    size_t num_padding_bytes = this->data.back();
+    this->data.resize(this->data.size() - num_padding_bytes);
+    return;
+}
+
 uint8_t BinaryBlob::getBits(uint8_t b, int start, int len)
 {
     return (b & ((1 << (start + len)) - 1)) >> start;

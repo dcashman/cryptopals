@@ -76,6 +76,11 @@ class BinaryBlob {
      */
     void padPKCS7(size_t blocksize);
 
+    /*
+     * Remove PKCS#7 padding.
+     */
+    void stripPKCS7();
+
  private:
     static uint8_t getBits(uint8_t b, int start, int len);
     static void setBits(uint8_t &dest, uint8_t src, int start, int len);

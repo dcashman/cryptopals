@@ -34,6 +34,16 @@ cc_library(
 )
 
 cc_library(
+    name = "Block",
+    srcs = ["Block.cc"],
+    hdrs = ["Block.h"],
+    deps = [
+         ":BinaryBlob",
+         "@boringssl//:crypto",
+    ],
+)
+
+cc_library(
     name = "freq",
     srcs = ["freq.cc"],
 )
@@ -44,7 +54,7 @@ cc_library(
     hdrs = ["matasano_problems.h"],
     deps = [
          ":Analysis",
-         "@boringssl//:crypto",
+         ":Block",
     ],
 )
 
