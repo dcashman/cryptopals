@@ -49,7 +49,7 @@ TEST_F(BinaryBlobTest, padPKCS7Full) {
     }
 }
 
-TEST_F(BinaryBlobTest, stripPKCS7F) {
+TEST_F(BinaryBlobTest, stripPKCS7) {
     // Make sure that after padding, stripping the padding will give us back
     // what we started with.  Note: Stripping padding from an unpadded blob is
     // not supported (we don't verify that it's padded first).
