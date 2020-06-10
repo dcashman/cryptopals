@@ -48,3 +48,17 @@ TEST_F(BinaryBlobTest, padPKCS7Full) {
         EXPECT_EQ(4, binary_blob_.getByte(i));
     }
 }
+
+TEST_F(BinaryBlobTest, stripPKCS7F) {
+    // Make sure that after padding, stripping the padding will give us back
+    // what we started with.  Note: Stripping padding from an unpadded blob is
+    // not supported (we don't verify that it's padded first).
+    binary_blob_.padPKCS7(16);
+    binary_blob_.stripPKCS7();
+    // Make sure original data wasn't altered.
+    for (int i = 0; i < 4; i++) {
+        EXPECT_EQ(i, binary_blob_.getByte(i));
+    }
+    // Make sure we're the right size.
+    EXPECT_EQ(4, binary_blob_.size());
+}

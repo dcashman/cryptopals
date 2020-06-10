@@ -9,7 +9,8 @@
 #include "BinaryBlob.h"
 
 /*
- * CBC implementation using AES as the underlying block cipher.
+ * CBC implementation using AES as the underlying block cipher. Provided
+ * plaintext will be padded prior to encryption.
  *
  * Returns the ciphertext of the provided plaintext.
  */
