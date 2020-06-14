@@ -1,3 +1,5 @@
+#include <random>
+
 #include "BinaryBlob.h"
 
 static const size_t BYTE_SZ = 1 << 8;
@@ -99,7 +101,7 @@ size_t BinaryBlob::size()
     return data.size();
 }
 
-BinaryBlob& BinaryBlob::operator+=(BinaryBlob& rh)
+BinaryBlob& BinaryBlob::operator+=(BinaryBlob rh)
 {
     for (auto const& b : rh.data)
         this->data.push_back(b);
@@ -235,6 +237,21 @@ void BinaryBlob::stripPKCS7() {
     this->data.resize(this->data.size() - num_padding_bytes);
     return;
 }
+
+/* Create a new BinaryBlob with random input for len bytes. */
+BinaryBlob BinaryBlob::RandomBlob(size_t len) {
+    size_t bytes_per_call = sizeof(unsigned);
+    std::random_device rd{};
+    BinaryBlob output{};
+    while (len > 0) {
+        unsigned x = rd();
+        BinaryBlob tmp = BinaryBlob((uint8_t*) &x, bytes_per_call);
+        output += tmp.getBytesSlice(0, std::min(len, bytes_per_call));
+        len -= bytes_per_call;
+    }
+    return output;
+}
+
 
 uint8_t BinaryBlob::getBits(uint8_t b, int start, int len)
 {

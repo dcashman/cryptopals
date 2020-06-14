@@ -62,3 +62,14 @@ TEST_F(BinaryBlobTest, stripPKCS7) {
     // Make sure we're the right size.
     EXPECT_EQ(4, binary_blob_.size());
 }
+
+TEST_F(BinaryBlobTest, RandomBlob) {
+    // Rand tests are hard, so for now let's just verify that if we create two
+    // random blobs, they are distinct from each other and have the expected
+    // sizes.
+    BinaryBlob b1 = BinaryBlob::RandomBlob(4);
+    BinaryBlob b2 = BinaryBlob::RandomBlob(4);
+    EXPECT_EQ(4, b1.size());
+    EXPECT_EQ(4, b2.size());
+    EXPECT_NE(b1.hex(), b2.hex());
+}

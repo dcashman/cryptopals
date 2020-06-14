@@ -46,7 +46,7 @@ class BinaryBlob {
     /*
      * add two binary blobs.  concatenates the rhs to the lhs
      */
-    BinaryBlob& operator+=(BinaryBlob &rh);
+    BinaryBlob& operator+=(BinaryBlob rh);
 
     /*
      * xor two binary blobs.  This is just the xor-ing of each byte in each.
@@ -80,6 +80,14 @@ class BinaryBlob {
      * Remove PKCS#7 padding.
      */
     void stripPKCS7();
+
+    /* Create a new BinaryBlob with random input for len bytes.
+     *
+     * CAUTION: This is not cryptographically secure, despite its use as part of
+     *  a crytpo challenge
+     */
+    static BinaryBlob RandomBlob(size_t len);
+
 
  private:
     static uint8_t getBits(uint8_t b, int start, int len);
