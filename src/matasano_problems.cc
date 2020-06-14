@@ -162,6 +162,5 @@ std::string problem10() {
     BinaryBlob b10 = BinaryBlob(in, 64);
     BinaryBlob key{"YELLOW SUBMARINE", 256};
     BinaryBlob plaintext = cbc_aes_decrypt(b10, key, 16);
-    plaintext.stripPKCS7();
     return plaintext.ascii();
 }

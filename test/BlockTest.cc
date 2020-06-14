@@ -25,6 +25,15 @@ TEST(BlockTest, aes_decrypt) {
     EXPECT_EQ(input.hex(), original.hex());
 }
 
+TEST(BlockTest, cbc_aes_encrypt) {
+    BinaryBlob iv = BinaryBlob("initializationV!", 256);
+    BinaryBlob input = BinaryBlob("I'm back and I'm", 256);
+    BinaryBlob key = BinaryBlob("YELLOW SUBMARINE", 256);
+    BinaryBlob output = cbc_aes_encrypt(iv, input, key, 16);
+    EXPECT_EQ(output.B64(),
+        "aW5pdGlhbGl6YXRpb25WIRsRSoupcrK5Ox6tl0sLsRZX48MGiD4lRidSPJ8gZ8Jr");
+}
+
 TEST(BlockTest, cbc_aes_decrypt) {
     // We've already verified that cbc_aes_encrypt works as above, so here we just
     // make sure that if we encrypt something and then decrypt it, we get the
@@ -34,6 +43,21 @@ TEST(BlockTest, cbc_aes_decrypt) {
     BinaryBlob key = BinaryBlob("YELLOW SUBMARINE", 256);
     BinaryBlob output = cbc_aes_encrypt(iv, input, key, 16);
     BinaryBlob original = cbc_aes_decrypt(output, key, 16);
-    original.stripPKCS7();
+    EXPECT_EQ(input.hex(), original.hex());
+}
+
+TEST(BlockTest, ecb_aes_encrypt) {
+    BinaryBlob iv = BinaryBlob("initializationV!", 256);
+    BinaryBlob input = BinaryBlob("I'm back and I'm", 256);
+    BinaryBlob key = BinaryBlob("YELLOW SUBMARINE", 256);
+    BinaryBlob output = ecb_aes_encrypt(input, key, 16);
+    EXPECT_EQ(output.B64(), "CRIwqt4+szDbqkNY+I0qbGD6NnB+RfSZ26DyW5IjAaUA=");
+}
+
+TEST(BlockTest, ecb_aes_decrypt) {
+    BinaryBlob input = BinaryBlob("I'm back and I'm", 256);
+    BinaryBlob key = BinaryBlob("YELLOW SUBMARINE", 256);
+    BinaryBlob output = ecb_aes_encrypt(input, key, 16);
+    BinaryBlob original = ecb_aes_decrypt(output, key, 16);
     EXPECT_EQ(input.hex(), original.hex());
 }

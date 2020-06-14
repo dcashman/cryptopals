@@ -19,9 +19,24 @@ BinaryBlob cbc_aes_encrypt(BinaryBlob& iv, BinaryBlob plaintext, BinaryBlob& key
 /*
  * CBC implementation using AES as the underlying block cipher.
  *
- * Returns the plaintext of the provided ciphertext.
+ * Returns the plaintext of the provided ciphertext, with padding removed.
  */
 BinaryBlob cbc_aes_decrypt(BinaryBlob& ciphertext, BinaryBlob& key, size_t blocksize);
+
+/*
+ * ECB implementation using AES as the underlying block cipher. Provided
+ * plaintext will be padded prior to encryption.
+ *
+ * Returns the ciphertext of the provided plaintext.
+ */
+BinaryBlob ecb_aes_encrypt(BinaryBlob plaintext, BinaryBlob& key, size_t blocksize);
+
+/*
+ * CBC implementation using AES as the underlying block cipher.
+ *
+ * Returns the plaintext of the provided ciphertext, with padding removed.
+ */
+BinaryBlob ecb_aes_decrypt(BinaryBlob& ciphertext, BinaryBlob& key, size_t blocksize);
 
 /*
  * Encrypt a single block of blocksize using AES.  input and key must be of

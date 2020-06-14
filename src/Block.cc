@@ -41,7 +41,6 @@ BinaryBlob cbc_aes_encrypt(BinaryBlob& iv, BinaryBlob plaintext, BinaryBlob& key
 
     // Then separate into the different blocks.
     size_t num_blocks = plaintext.size()/blocksize;
-    std::cout << "DACASH plaintext num blocks after padding: " << num_blocks << std::endl;
     std::vector<BinaryBlob> input_blocks{};
     for (int i = 0; i < num_blocks; i++) {
         input_blocks.push_back(plaintext.getBytesSlice(blocksize * i, blocksize));
@@ -52,7 +51,6 @@ BinaryBlob cbc_aes_encrypt(BinaryBlob& iv, BinaryBlob plaintext, BinaryBlob& key
     for (int i = 0; i < num_blocks; i++) {
         // First grab the last block of the ciphertext.
         BinaryBlob previous_ciphertext = output.getBytesSlice(blocksize * i, blocksize);
-        std::cout << "DACASH - in[i] size: " << input_blocks[i].size() << " and prev ciphertext size: " << previous_ciphertext.size() << std::endl;
         BinaryBlob cipher_input = input_blocks[i] ^ previous_ciphertext;
         BinaryBlob ciphertext = aes_encrypt(cipher_input, key, blocksize);
         output += ciphertext;
@@ -77,10 +75,50 @@ BinaryBlob cbc_aes_decrypt(BinaryBlob& ciphertext, BinaryBlob& key, size_t block
     BinaryBlob output{};
     for (int i = 1; i < num_blocks; i++) {
         // Decrypt each block, and xor with the one before.
-        std::cout << "DACASH - cb[i] size: " << ciphertext_blocks[i].size() << " and cb[i-1] size: " << ciphertext_blocks[i-1].size() << std::endl;
         BinaryBlob plaintext = aes_decrypt(ciphertext_blocks[i], key, blocksize) ^ ciphertext_blocks[i - 1];
         output += plaintext;
     }
+    output.stripPKCS7();
+    return output;
+}
+
+// Partition the plaintext into blocks and AES encrypt each under the key.
+BinaryBlob ecb_aes_encrypt(BinaryBlob plaintext, BinaryBlob& key, size_t blocksize) {
+
+    // First pad to a multiple of blocksize.
+    plaintext.padPKCS7(blocksize);
+
+    // Then separate into the different blocks.
+    size_t num_blocks = plaintext.size()/blocksize;
+    std::vector<BinaryBlob> input_blocks{};
+    for (int i = 0; i < num_blocks; i++) {
+        input_blocks.push_back(plaintext.getBytesSlice(blocksize * i, blocksize));
+    }
+
+    BinaryBlob output{};
+    for (int i = 0; i < num_blocks; i++) {
+        BinaryBlob ciphertext = aes_encrypt(input_blocks[i], key, blocksize);
+        output += ciphertext;
+    }
+
+    return output;
+}
+
+// Partition the ciphertext into blocks and AES decrypt each under the key.
+BinaryBlob ecb_aes_decrypt(BinaryBlob& ciphertext, BinaryBlob& key, size_t blocksize) {
+    size_t num_blocks = ciphertext.size()/blocksize;
+    std::vector<BinaryBlob> ciphertext_blocks{};
+    for (int i = 0; i < num_blocks; i++) {
+        ciphertext_blocks.push_back(ciphertext.getBytesSlice(blocksize * i, blocksize));
+    }
+
+    BinaryBlob output{};
+    for (int i = 0; i < num_blocks; i++) {
+        // Decrypt each block.
+        BinaryBlob plaintext = aes_decrypt(ciphertext_blocks[i], key, blocksize);
+        output += plaintext;
+    }
+    output.stripPKCS7();
 
     return output;
 }
