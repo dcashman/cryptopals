@@ -23,8 +23,16 @@ BinaryBlob cbc_aes_encrypt(BinaryBlob& iv, BinaryBlob plaintext, BinaryBlob& key
  */
 BinaryBlob cbc_aes_decrypt(BinaryBlob& ciphertext, BinaryBlob& key, size_t blocksize);
 
+/*
+ * Encrypt a single block of blocksize using AES.  input and key must be of
+ * blocksize size.
+ */
 BinaryBlob aes_encrypt(BinaryBlob input, BinaryBlob key, size_t blocksize);
 
+/*
+ * Decrypt a single block of blocksize using AES.  input and key must be of
+ * blocksize size.
+ */
 BinaryBlob aes_decrypt(BinaryBlob input, BinaryBlob key, size_t blocksize);
 
 #endif /* BLOCK_H */
