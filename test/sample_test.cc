@@ -4,7 +4,6 @@
  */
 #include "gtest/gtest.h"
 
-TEST(SAMPLETEST, SAMP1) {
+TEST(SAMPLETEST, sample1) {
     EXPECT_EQ(1, 1);
-    EXPECT_EQ(1, 2);
 }
