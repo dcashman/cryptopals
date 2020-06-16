@@ -164,3 +164,7 @@ std::string problem10() {
     BinaryBlob plaintext = cbc_aes_decrypt(b10, key, 16);
     return plaintext.ascii();
 }
+
+std::string problem11() {
+    return "This is a placeholder.  This challenge asked to implement a function, not provide an answer.";
+}

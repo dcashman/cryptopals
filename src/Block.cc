@@ -1,5 +1,6 @@
 #include "Block.h"
 #include "src/include/openssl/aes.h"
+#include <cstdlib>
 #include <vector>
 
 BinaryBlob aes_encrypt(BinaryBlob input, BinaryBlob key, size_t blocksize) {
@@ -121,4 +122,55 @@ BinaryBlob ecb_aes_decrypt(BinaryBlob& ciphertext, BinaryBlob& key, size_t block
     output.stripPKCS7();
 
     return output;
+}
+
+BinaryBlob encryption_oracle(BinaryBlob input, bool cbc) {
+    const size_t BLOCKSIZE = 16;
+    // 5 - 10 extra bytes added to the beginning.
+    BinaryBlob modified_input = BinaryBlob::RandomBlob(rand() % 6 + 5);
+
+    modified_input += input;
+
+    // 5 - 10 extra bytes added to the end.
+    modified_input +=  BinaryBlob::RandomBlob(rand() % 6 + 5);
+
+    BinaryBlob aes_key = BinaryBlob::RandomBlob(BLOCKSIZE);
+    BinaryBlob iv = BinaryBlob::RandomBlob(BLOCKSIZE);
+
+    if (cbc) {
+        return cbc_aes_encrypt(iv, modified_input, aes_key, BLOCKSIZE);
+    } else {
+        return ecb_aes_encrypt(modified_input, aes_key, BLOCKSIZE);
+    }
+}
+
+BinaryBlob encryption_oracle(BinaryBlob input) {
+    return encryption_oracle(input, (bool) (rand() % 2));
+}
+
+
+bool detect_oracle_mode(bool cbc) {
+    // To detect ECB mode, we just need to see if the oracle will encrypt the
+    // blocks to the same ciphertext output. To get around the potentially 20
+    // extra bytes of added noise, we just need to choose a longer message. Here
+    // we choose a message which is 128 bytes long, which should be more than
+    // enough.
+    BinaryBlob payload{(uint8_t) 0, 128};
+    BinaryBlob oracle_output = encryption_oracle(payload, cbc);
+
+    // Let's just take a slice of the output somewhere in the middle, and then
+    // check to see if the same sequence is repeated.  We don't need to align on
+    // a block boundary since the same pattern is repeated over and over.
+    //
+    // Here we start after 32 bytes, since an IV would take 16, with potentially
+    // 10 more prepended, and sample 32 bytes to compare two consecutive blocks.
+    BinaryBlob sample_1 = oracle_output.getBytesSlice(32, 16);
+    BinaryBlob sample_2 = oracle_output.getBytesSlice(48, 16);
+
+    // If the two blocks are identical, we've got ourselves ECB, which
+    // has been arbitrarily mapped as false.
+    //
+    // TODO(dcashman): Fix BinaryBlob operators to support this without having
+    // to convert to hex.
+    return sample_1.hex() != sample_2.hex();
 }

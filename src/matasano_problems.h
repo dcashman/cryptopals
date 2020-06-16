@@ -37,4 +37,6 @@ std::string problem09();
 
 std::string problem10();
 
+std::string problem11();
+
 #endif //MATASANO_SET01_H

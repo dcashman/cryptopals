@@ -4,7 +4,7 @@
 
 #include "matasano_problems.h"
 
-#define MAX_PROBLEMS 10
+#define MAX_PROBLEMS 11
 
 std::string (*matasano_problems[MAX_PROBLEMS])() = {
     problem01,
@@ -17,6 +17,7 @@ std::string (*matasano_problems[MAX_PROBLEMS])() = {
     problem08,
     problem09,
     problem10,
+    problem11,
 };
 
 static void usage() {
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
     // get english ascii frequency distribution (based on moby dick).
     english_freq_table = create_ascii_freq_table(rootdir + "res/mobydick.txt");
 
-    std::cout << "matasano problem " << problem_num << " " << matasano_problems[problem_num - 1]() << "\n";
+    std::cout << "matasano problem " << problem_num << ": " << matasano_problems[problem_num - 1]() << "\n";
 
     return 0;
 }
