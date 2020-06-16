@@ -243,11 +243,12 @@ BinaryBlob BinaryBlob::RandomBlob(size_t len) {
     size_t bytes_per_call = sizeof(unsigned);
     std::random_device rd{};
     BinaryBlob output{};
-    while (len > 0) {
+    while (len) {
         unsigned x = rd();
         BinaryBlob tmp = BinaryBlob((uint8_t*) &x, bytes_per_call);
-        output += tmp.getBytesSlice(0, std::min(len, bytes_per_call));
-        len -= bytes_per_call;
+        size_t copy_amount = std::min(len, bytes_per_call);
+        output += tmp.getBytesSlice(0, copy_amount);
+        len -= copy_amount;
     }
     return output;
 }

@@ -73,3 +73,13 @@ TEST_F(BinaryBlobTest, RandomBlob) {
     EXPECT_EQ(4, b2.size());
     EXPECT_NE(b1.hex(), b2.hex());
 }
+
+TEST_F(BinaryBlobTest, RandomBlobNonAligned) {
+    // Also make sure that RandomBlob works for random numbers which are of
+    // inconvenient sizes.
+    BinaryBlob b1 = BinaryBlob::RandomBlob(7);
+    BinaryBlob b2 = BinaryBlob::RandomBlob(7);
+    EXPECT_EQ(7, b1.size());
+    EXPECT_EQ(7, b2.size());
+    EXPECT_NE(b1.hex(), b2.hex());
+}
