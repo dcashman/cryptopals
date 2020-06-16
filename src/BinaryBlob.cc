@@ -158,7 +158,6 @@ std::string BinaryBlob::B64()
 {
     // if current size is not divisible by 3, add padding
     size_t rem = (3 - this->size() % 3) % 3;
-    std::cout << "dacash rem: " << rem << " \n";
     for (int i = 0; i < rem; i++)
         data.push_back(0);
     int curr = 0;
