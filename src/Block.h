@@ -50,33 +50,4 @@ BinaryBlob aes_encrypt(BinaryBlob input, BinaryBlob key, size_t blocksize);
  */
 BinaryBlob aes_decrypt(BinaryBlob input, BinaryBlob key, size_t blocksize);
 
-/*
- * Visible for testing.
- *
- * Encryption oracle specified by p11.  Takes plaintext input and encrypts under
- * a random 16-byte key, after prepending 5-10 and appending 5-10 bytes, each
- * chosen randomly.
- *
- * Arg cbc is exposed purely for testing: to verify that this does what we
- * expect.  True means use CBC, false means use ECB.
- */
-BinaryBlob encryption_oracle(BinaryBlob input, bool cbc);
-
-/*
- * Encryption oracle specified by p11.  Takes plaintext input and encrypts under
- * a random 16-byte key, after prepending 5-10 and appending 5-10 bytes, each
- * chosen randomly.
- *
- * Calls encryption_oracle(BinaryBlob, bool) with random mode.
- */
-BinaryBlob encryption_oracle(BinaryBlob input);
-
-/*
- * Takes the output of the above encryption_oracle() and determines whether ecb
- * or cbc mode was used under the hood.  This one cheats, though, and tells the
- * oracle which mode to use.  This is not used as part of the detection, but
- * instead to just verify that we've done this correctly.
- */
-bool detect_oracle_mode(bool cbc);
-
 #endif /* BLOCK_H */

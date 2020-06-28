@@ -18,6 +18,16 @@ cc_test(
 )
 
 cc_test(
+    name = "MatasanoProblemsTest",
+    srcs = ["MatasanoProblemsTest.cc"],
+    deps = [
+        "@gtest//:gtest_main",
+        "//src:BinaryBlob",
+        "//src:matasano_problems",
+    ],
+)
+
+cc_test(
     name = "UtilsTest",
     srcs = ["UtilsTest.cc"],
     deps = [
