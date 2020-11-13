@@ -228,9 +228,11 @@ BinaryBlob p12_oracle(BinaryBlob input) {
         "dXN0IHRvIHNheSBoaQpEaWQgeW91IHN0b3A/IE5vLCBJIGp1c3QgZHJvdmUg"
         "YnkK";
     BinaryBlob secret_text = BinaryBlob(SECRET, 64);
+
+    // TODO: Add operator to BinaryBlob to enable us to just do b1 = b2 + b3.
     BinaryBlob plaintext{};
-    plaintext += secret_text;
     plaintext += input;
+    plaintext += secret_text;
     return ecb_aes_encrypt(plaintext, aes_key, 16);
 }
 
