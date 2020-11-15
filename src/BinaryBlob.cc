@@ -108,6 +108,14 @@ BinaryBlob& BinaryBlob::operator+=(BinaryBlob rh)
     return *this;
 }
 
+BinaryBlob BinaryBlob::operator+(const BinaryBlob& rh) {
+    BinaryBlob blob;
+    blob += *this;
+    blob += rh;
+    return blob;
+}
+
+
 //BinaryBlob BinaryBlob::operator^(BinaryBlob& lh, BinaryBlob& rh)
 BinaryBlob BinaryBlob::operator^(BinaryBlob& rh)
 {

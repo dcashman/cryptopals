@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "src/BinaryBlob.h"
 
+#include <stdio.h>
 
 class BinaryBlobTest : public ::testing::Test {
 protected:
@@ -11,6 +12,14 @@ protected:
         binary_blob_ = BinaryBlob(data, 4);
     }
 };
+
+TEST_F(BinaryBlobTest, testBinaryAddition) {
+    BinaryBlob sum = binary_blob_ + binary_blob_;
+    uint8_t bytes[8];
+    memcpy(bytes, binary_blob_.getRawBuf(), 4);
+    memcpy(&bytes[4], binary_blob_.getRawBuf(), 4);
+    EXPECT_EQ(0, memcmp(bytes, sum.getRawBuf(), sum.size()));
+}
 
 TEST_F(BinaryBlobTest, getByteEmpty) {
     BinaryBlob binary_blob{};
