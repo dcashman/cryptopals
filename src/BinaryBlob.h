@@ -51,7 +51,7 @@ class BinaryBlob {
     /*
      * add two binary blobs.  concatenates the rhs to the lhs
      */
-    BinaryBlob operator+(const BinaryBlob& rh);
+    friend BinaryBlob operator+(BinaryBlob lh, const BinaryBlob& rh);
 
     /*
      * xor two binary blobs.  This is just the xor-ing of each byte in each.
