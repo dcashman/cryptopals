@@ -73,7 +73,7 @@ BinaryBlob::BinaryBlob(std::string s, unsigned int base)
         }
     }
     // extra base64 check
-    if (s[s.size() - 2] == '=')
+
         data.pop_back();
     if (s[s.size() - 1] == '=')
         data.pop_back();
@@ -113,6 +113,13 @@ BinaryBlob operator+(BinaryBlob lh, const BinaryBlob& rh) {
     return lh;
 }
 
+bool operator==(BinaryBlob lh, const BinaryBlob& rh) {
+    return lh.data == rh.data;
+}
+
+bool operator!=(BinaryBlob lh, const BinaryBlob& rh) {
+    return !(lh.data == rh.data);
+}
 
 //BinaryBlob BinaryBlob::operator^(BinaryBlob& lh, BinaryBlob& rh)
 BinaryBlob BinaryBlob::operator^(BinaryBlob& rh)

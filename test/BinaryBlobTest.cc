@@ -21,6 +21,22 @@ TEST_F(BinaryBlobTest, testBinaryAddition) {
     EXPECT_EQ(0, memcmp(bytes, sum.getRawBuf(), sum.size()));
 }
 
+TEST_F(BinaryBlobTest, testBinaryEquality) {
+    BinaryBlob zeroes = BinaryBlob('0', 4);
+    BinaryBlob ones = BinaryBlob('1', 4);
+    BinaryBlob ones2 = BinaryBlob('1', 4);
+    EXPECT_TRUE(ones == ones2);
+    EXPECT_FALSE(ones == zeroes);
+}
+
+TEST_F(BinaryBlobTest, testBinaryInequality) {
+    BinaryBlob zeroes = BinaryBlob('0', 4);
+    BinaryBlob ones = BinaryBlob('1', 4);
+    BinaryBlob ones2 = BinaryBlob('1', 4);
+    EXPECT_FALSE(ones != ones2);
+    EXPECT_TRUE(ones != zeroes);
+}
+
 TEST_F(BinaryBlobTest, getByteEmpty) {
     BinaryBlob binary_blob{};
     EXPECT_EQ(0, binary_blob.getByte(0));

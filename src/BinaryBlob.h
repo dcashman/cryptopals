@@ -54,6 +54,16 @@ class BinaryBlob {
     friend BinaryBlob operator+(BinaryBlob lh, const BinaryBlob& rh);
 
     /*
+     * Compare two blobs for equality.
+     */
+    friend bool operator==(BinaryBlob lh, const BinaryBlob& rh);
+
+    /*
+     * Compare two blobs for (in)equality.
+     */
+    friend bool operator!=(BinaryBlob lh, const BinaryBlob& rh);
+
+    /*
      * xor two binary blobs.  This is just the xor-ing of each byte in each.
      * sizes must be the same.
      */
