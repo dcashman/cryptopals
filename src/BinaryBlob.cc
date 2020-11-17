@@ -8,7 +8,7 @@ BinaryBlob::BinaryBlob() : data(0)
 {
 }
 
-BinaryBlob::BinaryBlob(uint8_t* bytes, size_t len)
+BinaryBlob::BinaryBlob(const uint8_t* bytes, size_t len)
 {
     data.resize(len);
     for (int i = 0; i < len; i++)
@@ -30,7 +30,7 @@ BinaryBlob::BinaryBlob(std::ifstream& infile)
         data.push_back((uint8_t) c);
 }
 
-BinaryBlob::BinaryBlob(std::string s, unsigned int base)
+BinaryBlob::BinaryBlob(const std::string s, unsigned int base)
 {
     if (!(base == 16 || base == 8 || base == 2 || base == 256 || base == 64))
         throw std::invalid_argument("BinaryBlob input must supported base: [2, 8, 16, 64, 256].");
@@ -72,14 +72,18 @@ BinaryBlob::BinaryBlob(std::string s, unsigned int base)
             curr_bits_left -= num_saved;
         }
     }
-    // extra base64 check
 
-        data.pop_back();
-    if (s[s.size() - 1] == '=')
-        data.pop_back();
+    // A base64 encoding might include padding which we need to remove, one byte
+    // per padding character. Remove them here.
+    if (base == 64) {
+        if (*(s.end() - 1) == '=')
+            data.pop_back();
+        if (*(s.end() - 2) == '=')
+            data.pop_back();
+    }
 }
 
-uint8_t BinaryBlob::getByte(size_t n) {
+uint8_t BinaryBlob::getByte(size_t n) const {
     if (n >= data.size())
         return 0;
     else
@@ -90,18 +94,18 @@ uint8_t* BinaryBlob::getRawBuf() {
     return data.data();
 }
 
-BinaryBlob BinaryBlob::getBytesSlice(int start_index, size_t len) {
+BinaryBlob BinaryBlob::getBytesSlice(int start_index, size_t len) const {
     if (!(start_index + len <= data.size()))
         throw std::invalid_argument("Attempt to get slice beyond bounds of BinaryBlob");
     return BinaryBlob(&data[start_index], len);
 }
 
-size_t BinaryBlob::size()
+size_t BinaryBlob::size() const
 {
     return data.size();
 }
 
-BinaryBlob& BinaryBlob::operator+=(BinaryBlob rh)
+BinaryBlob& BinaryBlob::operator+=(const BinaryBlob& rh)
 {
     for (auto const& b : rh.data)
         this->data.push_back(b);
@@ -113,23 +117,24 @@ BinaryBlob operator+(BinaryBlob lh, const BinaryBlob& rh) {
     return lh;
 }
 
-bool operator==(BinaryBlob lh, const BinaryBlob& rh) {
+bool operator==(const BinaryBlob& lh, const BinaryBlob& rh) {
     return lh.data == rh.data;
 }
 
-bool operator!=(BinaryBlob lh, const BinaryBlob& rh) {
+bool operator!=(const BinaryBlob& lh, const BinaryBlob& rh) {
     return !(lh.data == rh.data);
 }
 
-//BinaryBlob BinaryBlob::operator^(BinaryBlob& lh, BinaryBlob& rh)
-BinaryBlob BinaryBlob::operator^(BinaryBlob& rh)
+BinaryBlob BinaryBlob::operator^(const BinaryBlob& rh) const
 {
-    if (size() != rh.size())
+    if (size() != rh.size()) {
+        std::cerr << "BinaryBlob ^ lhs size: " << size() << " rhs size: " << rh.size() << std::endl;
         throw std::invalid_argument("BinaryBlob binary ^ operator args must have same size");
-    std::vector<uint8_t>::iterator lh_i = data.begin();
-    std::vector<uint8_t>::iterator lh_iend = data.end();
-    std::vector<uint8_t>::iterator rh_i = rh.data.begin();
-    std::vector<uint8_t>::iterator rh_iend = rh.data.end();
+    }
+    std::vector<uint8_t>::const_iterator lh_i = data.begin();
+    std::vector<uint8_t>::const_iterator lh_iend = data.end();
+    std::vector<uint8_t>::const_iterator rh_i = rh.data.begin();
+    std::vector<uint8_t>::const_iterator rh_iend = rh.data.end();
     BinaryBlob ret;
     while (lh_i != lh_iend && rh_i != rh_iend) {
         ret.data.push_back(*lh_i++ ^ *rh_i++);
@@ -137,10 +142,10 @@ BinaryBlob BinaryBlob::operator^(BinaryBlob& rh)
     return ret;
 }
 
-std::vector<double> BinaryBlob::create_ascii_freq_table()
+std::vector<double> BinaryBlob::create_ascii_freq_table() const
 {
     std::vector<int> counts(BYTE_SZ, 0);
-    for (auto& c : data)
+    for (const auto& c : data)
         counts[c]++;
     unsigned int total = 0;
     for (int i = 0; i < BYTE_SZ; i++)
@@ -151,15 +156,15 @@ std::vector<double> BinaryBlob::create_ascii_freq_table()
     return res;
 }
 
-unsigned int BinaryBlob::hammingWeight()
+unsigned int BinaryBlob::hammingWeight() const
 {
     unsigned int res = 0;
-    for (auto& b : data)
+    for (const auto& b : data)
         res += hamming_weight(b);
     return res;
 }
 
-std::string BinaryBlob::ascii()
+std::string BinaryBlob::ascii() const
 {
     std::string ret;
     for (int i = 0; i < size(); i++)
@@ -167,19 +172,25 @@ std::string BinaryBlob::ascii()
     return ret;
 }
 
-std::string BinaryBlob::B64()
+std::string BinaryBlob::B64() const
 {
+    // B64 conversion is done by making the input a multiple of 3 bytes, so we
+    // may need to add some bytes to our input.  We don't want creating a B64
+    // string to modify our BinaryBlob, so we create a copy which we can modify
+    // here.
+    std::vector<uint8_t> data_copy = data;
+
     // if current size is not divisible by 3, add padding
-    size_t rem = (3 - this->size() % 3) % 3;
-    for (int i = 0; i < rem; i++)
-        data.push_back(0);
+    const size_t padding_size = (3 - data_copy.size() % 3) % 3;
+    for (int i = 0; i < padding_size; i++)
+        data_copy.push_back(0);
     int curr = 0;
     int curr_bits_left = 8;
     std::string out;
     size_t num_bits = 6;
-    while (curr != this->size()) {
+    while (curr != data_copy.size()) {
         if (curr_bits_left >= num_bits) {
-            out += binary_to_b64(getBits(data[curr], curr_bits_left - num_bits, num_bits));
+            out += binary_to_b64(getBits(data_copy[curr], curr_bits_left - num_bits, num_bits));
             curr_bits_left -= num_bits;
             if (curr_bits_left == 0) {
                 curr++;
@@ -188,21 +199,22 @@ std::string BinaryBlob::B64()
         } else {
             // get what's left, then combine with next byte
             size_t rem_bits = num_bits - curr_bits_left;
-            uint8_t tmp = getBits(data[curr++], 0, curr_bits_left) << rem_bits;
+            uint8_t tmp = getBits(data_copy[curr++], 0, curr_bits_left) << rem_bits;
             curr_bits_left = 8;
 
 
-            tmp |= getBits(data[curr], curr_bits_left - rem_bits, rem_bits);
+            tmp |= getBits(data_copy[curr], curr_bits_left - rem_bits, rem_bits);
             curr_bits_left -= rem_bits;
             out += binary_to_b64(tmp);
         }
     }
-    for (int i = 0; i < rem; i++)
-        out += '=';
+    // Replace the extra B64 characters generated from the padding with the
+    // explicit padding character: '='.
+    out.replace(out.end() - padding_size, out.end(), padding_size, '=');
     return out;
 }
 
-std::string BinaryBlob::hex()
+std::string BinaryBlob::hex() const
 {
     int curr = 0;
     int curr_bits_left = 8;

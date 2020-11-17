@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
     if (problem_num < 1 || problem_num > MAX_PROBLEMS )
         usage();
     // get english ascii frequency distribution (based on moby dick).
-    english_freq_table = create_ascii_freq_table(rootdir + "res/mobydick.txt");
+    english_freq_table = create_ascii_freq_table(rootdir + "/res/mobydick.txt");
 
     std::cout << "matasano problem " << problem_num << ": " << matasano_problems[problem_num - 1]() << "\n";
 

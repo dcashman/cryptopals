@@ -30,7 +30,7 @@ std::string problem04() {
     // score (least english-like).  Actually it looks like they're all garbage except for that one.  xor all strings w/all keys
     // and grab lowest scoring.
     std::ifstream instream;
-    instream.open(rootdir + "res/p4.txt", std::ios::in);
+    instream.open(rootdir + "/res/p4.txt", std::ios::in);
     if (!instream.is_open()) {
         std::cerr << "Can't open p4.txt\n";
         return std::string("p04 failed.\n");
@@ -70,7 +70,7 @@ std::string problem05() {
 /* decrypt repeating key xor */
 std::string problem06() {
     std::ifstream instream;
-    instream.open(rootdir + "res/p6.txt", std::ios::in);
+    instream.open(rootdir + "/res/p6.txt", std::ios::in);
     if (!instream.is_open()) {
         std::cerr << "Can't open p6.txt\n";
         return std::string("p06 failed.\n");
@@ -87,7 +87,7 @@ std::string problem06() {
 
 std::string problem07() {
     std::ifstream instream;
-    instream.open(rootdir + "res/p7.txt", std::ios::in);
+    instream.open(rootdir + "/res/p7.txt", std::ios::in);
     if (!instream.is_open()) {
         std::cerr << "Can't open p7.txt\n";
         return std::string("p07 failed.\n");
@@ -113,7 +113,7 @@ std::string problem07() {
 
 std::string problem08() {
     std::ifstream instream;
-    instream.open(rootdir + "res/p8.txt", std::ios::in);
+    instream.open(rootdir + "/res/p8.txt", std::ios::in);
     if (!instream.is_open()) {
         std::cerr << "Can't open p8.txt\n";
         return std::string("p08 failed.\n");
@@ -150,7 +150,7 @@ std::string problem09() {
 
 std::string problem10() {
     std::ifstream instream;
-    instream.open(rootdir + "res/p10.txt", std::ios::in);
+    instream.open(rootdir + "/res/p10.txt", std::ios::in);
     if (!instream.is_open()) {
         std::cerr << "Can't open p10.txt\n";
         return std::string("p10 failed.\n");

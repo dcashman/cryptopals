@@ -17,7 +17,7 @@ class BinaryBlob {
     BinaryBlob();
 
     /* Create binary blob holding the given binary data */
-    BinaryBlob(uint8_t* bytes, size_t len);
+    BinaryBlob(const uint8_t* bytes, size_t len);
 
     /* Create binary blob which repeats given byte, len times */
     BinaryBlob(uint8_t byte, size_t len);
@@ -28,59 +28,63 @@ class BinaryBlob {
     /* Create binary blob represented by the string s, with each character
      * interpreted as being from the given base.  Currently only base 16 and
      * 64 supported. */
-    BinaryBlob(std::string s, unsigned int base);
+    BinaryBlob(const std::string s, unsigned int base);
 
-    // get the n-indexed byte from the blob (starting at 0)
-    uint8_t getByte(size_t n);
+    // Get the n-indexed byte from the blob (starting at 0).
+    uint8_t getByte(size_t n) const;
 
-    // get the raw buffer containing the BinaryBlob
+    // Get the raw buffer containing the underlying data of this BinaryBlob.
+    //
+    // WARNING: This method provides direct, unprotected access and could be
+    // used to alter the BinaryBlob outside its the normal lifecylce.  Ownership
+    // is not respected and there is no guarantee that this pointer will remain
+    // valid.
+    // TODO: Move to a proper RAII model.
     uint8_t* getRawBuf();
 
-    // get new binary blob representing elements [start, end)
-    // TODO: use sp<>?
-    BinaryBlob getBytesSlice(int start_index, size_t len);
+    // Get new binary blob representing elements [start, end)
+    BinaryBlob getBytesSlice(int start_index, size_t len) const;
 
-    /* returns number of bytes in blob */
-    size_t size();
+    /* Returns number of bytes in blob */
+    size_t size() const;
 
     /*
-     * add two binary blobs.  concatenates the rhs to the lhs
+     * Add two binary blobs.  concatenates the rhs to the lhs
      */
-    BinaryBlob& operator+=(BinaryBlob rh);
+    BinaryBlob& operator+=(const BinaryBlob& rh);
 
     /*
-     * add two binary blobs.  concatenates the rhs to the lhs
+     * Add two binary blobs.  concatenates the rhs to the lhs
      */
     friend BinaryBlob operator+(BinaryBlob lh, const BinaryBlob& rh);
 
     /*
      * Compare two blobs for equality.
      */
-    friend bool operator==(BinaryBlob lh, const BinaryBlob& rh);
+    friend bool operator==(const BinaryBlob& lh, const BinaryBlob& rh);
 
     /*
      * Compare two blobs for (in)equality.
      */
-    friend bool operator!=(BinaryBlob lh, const BinaryBlob& rh);
+    friend bool operator!=(const BinaryBlob& lh, const BinaryBlob& rh);
 
     /*
-     * xor two binary blobs.  This is just the xor-ing of each byte in each.
+     * XOR two binary blobs.  This is just the xor-ing of each byte in each.
      * sizes must be the same.
      */
-    //    BinaryBlob operator^(BinaryBlob& lh, BinaryBlob &rh);
-    BinaryBlob operator^(BinaryBlob &rh);
+    BinaryBlob operator^(const BinaryBlob &rh) const;
 
     /* grab frequency of each byte value, might eventually transfer this into
      * something greater than bytes. Caller must free.
      */
-    std::vector<double> create_ascii_freq_table();
+    std::vector<double> create_ascii_freq_table() const;
 
-    unsigned int hammingWeight();
+    unsigned int hammingWeight() const;
 
     /* pretty-printing */
-    std::string ascii();
-    std::string B64();
-    std::string hex();
+    std::string ascii() const;
+    std::string B64() const;
+    std::string hex() const;
 
     /*
      * PKCS#7 padding.  Add padding to the end of the binary blob so that it is

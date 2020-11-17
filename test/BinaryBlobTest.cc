@@ -13,6 +13,19 @@ protected:
     }
 };
 
+TEST_F(BinaryBlobTest, testPrettyB64) {
+    uint8_t data[4] = {1, 2, 3, 4};
+    // 1) no padding
+    BinaryBlob no_padding{data, 3};
+    EXPECT_EQ("AQID", no_padding.B64());
+    // 2) one padded character
+    BinaryBlob one_padding{data, 2};
+    EXPECT_EQ("AQI=", one_padding.B64());
+    // 3) two padded characters
+    BinaryBlob two_padding{data, 4};
+    EXPECT_EQ("AQIDBA==", two_padding.B64());
+}
+
 TEST_F(BinaryBlobTest, testBinaryAddition) {
     BinaryBlob sum = binary_blob_ + binary_blob_;
     uint8_t bytes[8];

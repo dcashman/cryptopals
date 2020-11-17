@@ -124,6 +124,5 @@ BinaryBlob breakRepeatingKeyXor(std::vector<double>& freq_table, BinaryBlob& cip
             min_score = total/hammingScores.size();
         }
     }
-    std::cout << "DACASH - keysize is probably " << min_ks << "\n";
     return breakRepeatingKeyXor(freq_table, ciphertext, min_ks);
 }
