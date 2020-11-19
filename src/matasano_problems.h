@@ -75,4 +75,6 @@ BinaryBlob p12_oracle(BinaryBlob input);
 
 std::string problem12();
 
+std::string problem13();
+
 #endif //MATASANO_SET01_H
