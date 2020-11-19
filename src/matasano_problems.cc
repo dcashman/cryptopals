@@ -236,6 +236,94 @@ BinaryBlob p12_oracle(BinaryBlob input) {
     return ecb_aes_encrypt(plaintext, aes_key, 16);
 }
 
+// Decipher the 'SECRET' included in the p12_oracle and convert to readable text.
 std::string problem12() {
-    return "Hullo";
+    // Steps to decipher secret (also in prompt).
+    // 1) Since we know that the input is being padded, we can just feed bytes
+    //   to the input until the ciphertext size increases.  It should increaes
+    //   by one block-size, et voila.
+    BinaryBlob empty{};
+    BinaryBlob empty_ciphertext = p12_oracle(empty);
+    size_t initial_size = empty_ciphertext.size();
+    size_t test_size = initial_size;
+    int extra_bytes = 0;
+    do {
+        BinaryBlob padding = BinaryBlob('0', ++extra_bytes);
+
+        // TODO: Add operator to BinaryBlob to enable us to just do b1 = b2 + b3.
+        BinaryBlob tmp{};
+        tmp += padding;
+        test_size = p12_oracle(tmp).size();
+    } while (test_size == initial_size);
+
+    size_t block_size = test_size - initial_size;
+
+
+    // 2)  Detect whether or not in ECB mode. This can be done by feeding the
+    //   oracle 2 identical blocks and seeing if they are identical.
+    BinaryBlob ecb_test = p12_oracle(BinaryBlob('0', block_size * 2));
+    if (ecb_test.getBytesSlice(0, block_size) != ecb_test.getBytesSlice(block_size, block_size)) {
+        return "Unable to perform attack on non-ECB oracle.";
+    }
+
+
+    // 3) Compute a lookup table for the values of one block where the first N
+    //   bytes are always the same, and we only need to check the lookup table
+    //   to determine the last BLOCKSIZE - N bytes (here just the last byte).
+    BinaryBlob lookup_table[256];
+
+
+    // 4) Use our ability to shift the block-alignment of the ciphertext to
+    // isolate the next unknown plaintext byte at the end of a block where we
+    // already know the plaintext for all of the preceding bytes in that block.
+    // We bootstrap this process by filling up all but the last byte of our
+    // initial input with 0's, which will form our first lookup table base.
+    size_t padding_amount = block_size - 1;
+    const BinaryBlob padding_bank = BinaryBlob('0', block_size - 1);
+
+    // We will store our gradually revealed plaintext here. This will eventually
+    // be used as the base of the lookup tables as we progress beyond the first
+    // block, where we use our initial padding.
+    BinaryBlob deduced_plaintext{};
+
+    // Clear padding from ciphertext so we know how many plaintext bytes we need
+    // (there is 1-1 mapping between plaintext and ciphertext minus padding).
+    empty_ciphertext.stripPKCS7();
+
+    // 5) Generate a new lookup table and decipher one byte at a time for the
+    // entire plaintext.
+    for (size_t i = 0; i < empty_ciphertext.size(); i++ ) {
+
+        // Combine the padding with known result so far, and take the last
+        // BLOCKSIZE - 1 bytes.
+        BinaryBlob base = padding_bank + deduced_plaintext;
+        base = base.getBytesSlice(base.size() - padding_amount, padding_amount);
+        for (int j = 0; j < 256; j++) {
+            BinaryBlob tmp = base;
+            tmp += BinaryBlob((uint8_t) j, 1);
+
+            // First block of oracle ciphertext is the ciphertext of our chosen
+            // input.
+            lookup_table[j] = p12_oracle(tmp).getBytesSlice(0, block_size);
+        }
+
+        // Get the block from the 'real result' we want to compare.
+        size_t focal_block = deduced_plaintext.size() / block_size;
+
+        // Determine how much padding we need to position the next byte at the
+        // end of a block (so we can look it up in our lookup table).
+        size_t padding_size =
+            padding_amount - (deduced_plaintext.size() % block_size);
+        BinaryBlob actual = p12_oracle(padding_bank.getBytesSlice(0, padding_size))
+            .getBytesSlice(focal_block, block_size);
+
+        // Now check our lookup table and record the latest byte.
+        for (int j = 0; j < 256; j++) {
+            if (lookup_table[j] == actual) {
+                deduced_plaintext += BinaryBlob((uint8_t) j, 1);
+                break;
+            }
+        }
+    }
+    return deduced_plaintext.ascii();
 }
