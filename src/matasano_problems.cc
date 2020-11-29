@@ -244,7 +244,6 @@ std::string problem12() {
     int extra_bytes = 0;
     do {
         BinaryBlob padding = BinaryBlob('0', ++extra_bytes);
-
         test_size = p12_oracle(padding).size();
     } while (test_size == initial_size);
 
@@ -270,7 +269,6 @@ std::string problem12() {
     // initial input with 0's, which will form our first lookup table base.
     const size_t padding_amount = block_size - 1;
     const BinaryBlob padding_bank = BinaryBlob((uint8_t) 0, block_size - 1);
-
     // We will store our gradually revealed plaintext here. This will eventually
     // be used as the base of the lookup tables as we progress beyond the first
     // block, where we use our initial padding.
@@ -280,7 +278,6 @@ std::string problem12() {
     // entire plaintext.
 
     for (size_t i = 0; i < initial_size; i++ ) {
-
         // Combine the padding with known result so far, and take the last
         // BLOCKSIZE - 1 bytes.
         BinaryBlob base = padding_bank + deduced_plaintext;
@@ -303,7 +300,6 @@ std::string problem12() {
             padding_amount - (deduced_plaintext.size() % block_size);
         BinaryBlob actual = p12_oracle(padding_bank.getBytesSlice(0, padding_size))
             .getBytesSlice(focal_block * block_size, block_size);
-
         // Now check our lookup table and record the latest byte.
         for (int j = 0; j < 256; j++) {
             if (lookup_table[j] == actual) {
